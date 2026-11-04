@@ -3,22 +3,31 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 
+// Define the type for the API result to fix the 'never' errors
+type DetectionResult = {
+  isAi: boolean;
+  confidence: string | number;
+  error?: string;
+};
+
 export default function Home() {
-  const [image, setImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [currentYear, setCurrentYear] = useState("");
-  const [openFaq, setOpenFaq] = useState(0);
+  // Added TypeScript types to all state variables
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [result, setResult] = useState<DetectionResult | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [currentYear, setCurrentYear] = useState<string>("");
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   // States for Features
-  const [usageCount, setUsageCount] = useState(0);
-  const [showModal, setShowModal] = useState(false); // MSME Modal
-  const [showCyberModal, setShowCyberModal] = useState(false); // Cyber Crime Modal
+  const [usageCount, setUsageCount] = useState<number>(0);
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [showCyberModal, setShowCyberModal] = useState<boolean>(false);
   const MAX_LIMIT = 10;
 
-  const fileInputRef = useRef(null);
+  // Added HTMLInputElement type to the ref to fix the 'click' error
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setCurrentYear(new Date().getFullYear().toString());
@@ -45,9 +54,9 @@ export default function Home() {
       );
     }
 
-    // Simplified Intersection Observer (only for lower sections to prevent hiding main UI)
+    // Intersection Observer types
     const observer = new IntersectionObserver(
-      (entries) => {
+      (entries: IntersectionObserverEntry[]) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add("reveal-visible");
@@ -64,7 +73,8 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
-  const validateAndSetFile = (file) => {
+  // Added File type to the parameter
+  const validateAndSetFile = (file: File | null | undefined) => {
     if (usageCount >= MAX_LIMIT) return;
     if (!file) return;
     if (!file.type.startsWith("image/")) {
@@ -80,16 +90,24 @@ export default function Home() {
     setResult(null);
   };
 
-  const handleImageChange = (e) => validateAndSetFile(e.target.files[0]);
-  const handleDragOver = (e) => {
+  // Added exact React event types for all handlers
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      validateAndSetFile(e.target.files[0]);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     if (usageCount < MAX_LIMIT) setIsDragging(true);
   };
-  const handleDragLeave = (e) => {
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
   };
-  const handleDrop = (e) => {
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
     if (usageCount >= MAX_LIMIT) return;
@@ -120,7 +138,7 @@ export default function Home() {
         method: "POST",
         body: formData,
       });
-      const data = await response.json();
+      const data: DetectionResult = await response.json();
 
       if (data.error) {
         alert(data.error);
@@ -152,8 +170,8 @@ export default function Home() {
   };
 
   const getProbabilities = () => {
-    if (!result) return { ai: 0, real: 0 };
-    const aiScore = parseFloat(result.confidence);
+    if (!result) return { ai: "0.0", real: "0.0" };
+    const aiScore = parseFloat(String(result.confidence));
     const realScore = 100 - aiScore;
     return { ai: aiScore.toFixed(1), real: realScore.toFixed(1) };
   };
@@ -348,7 +366,7 @@ export default function Home() {
           <div
             className="bento-item position-relative p-5 text-center"
             style={{ maxWidth: "600px" }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e: React.MouseEvent) => e.stopPropagation()}
           >
             <button
               className="btn-close btn-close-white position-absolute top-0 end-0 m-4"
@@ -411,7 +429,7 @@ export default function Home() {
               border: "1px solid rgba(239, 68, 68, 0.5)",
               background: "rgba(30, 10, 10, 0.9)",
             }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e: React.MouseEvent) => e.stopPropagation()}
           >
             <button
               className="btn-close btn-close-white position-absolute top-0 end-0 m-4"
@@ -672,7 +690,7 @@ export default function Home() {
                           color: "#94a3b8",
                         }}
                       >
-                        {image.name}
+                        {image?.name}
                       </span>
                     </div>
                   ) : (
