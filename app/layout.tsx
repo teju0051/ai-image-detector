@@ -12,7 +12,6 @@ export const metadata = {
     "is this image ai generated",
     "real or fake photo checker",
     "deepfake scanner",
-    "midjourney detector",
     "dall-e detector",
     "ai generated image test",
     "synthetic media verification",
