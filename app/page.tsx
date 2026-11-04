@@ -1461,7 +1461,7 @@ export default function Home() {
                 className="mb-0 fw-medium fs-6 ms-3 ps-3 border-start border-secondary border-opacity-25"
                 style={{ color: "#64748b" }}
               >
-                © {currentYear || "2026"} All rights reserved.
+                © {currentYear || "2026"} All rights reserved
               </p>
             </div>
             <div className="d-flex gap-4">
